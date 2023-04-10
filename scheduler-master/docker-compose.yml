@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mongo:
+    image: 'mongo:4.1.8-xenial'
+    ports:
+      - '27017:27017'
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - '4001:80'
+  client:
+    build:
+      context: ./client
+      dockerfile: dev.Dockerfile
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment:
+      - NODE_ENV=development
+      - SERVER_URI=http://server:5000
+  server:
+    build:
+      context: ./server
+      dockerfile: dev.Dockerfile
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - AUTH_REDIRECT_URL_BASE=http://localhost:4001
+      - NODE_ENV=development
